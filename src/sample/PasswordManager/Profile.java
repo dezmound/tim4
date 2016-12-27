@@ -3,6 +3,7 @@ package sample.PasswordManager;
 import sample.CryptoService.CryptoProvider;
 import sample.CryptoService.Encryptable;
 
+import java.awt.color.ProfileDataException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
@@ -33,10 +34,12 @@ public class Profile implements Encryptable, Serializable {
             return false;
         if(value.length() > 255)
             return false;
-        if(value.length() < 6)
-            return false;
         this.password = value;
         return true;
+    }
+    public Profile(Profile profile) {
+        this.name = profile.getName();
+        this.password = profile.getPassword();
     }
     public Profile(String name, String password) {
         this.name = name;
@@ -45,14 +48,26 @@ public class Profile implements Encryptable, Serializable {
 
     @Override
     public void encrypt(CryptoProvider cryptoProvider) {
-        this.name = new String((new BigInteger(cryptoProvider.encrypt(this.name.getBytes()))).toString(16));
-        this.password = new String((new BigInteger(cryptoProvider.encrypt(this.password.getBytes()))).toString(16));
+        try {
+            this.name = new String((new BigInteger(cryptoProvider.encrypt(this.name.getBytes()))).toString(16));
+        } catch (NumberFormatException ex){
+            this.name = "";
+        }
+        try {
+            this.password = new String((new BigInteger(cryptoProvider.encrypt(this.password.getBytes()))).toString(16));
+        }catch (NumberFormatException ex){
+            this.password = "";
+        }
     }
 
     @Override
     public void decrypt(CryptoProvider cryptoProvider) {
-        this.name = new String(cryptoProvider.decrypt((new BigInteger(this.name, 16)).toByteArray()));
-        this.password = new String(cryptoProvider.decrypt((new BigInteger(this.password, 16)).toByteArray()));
+        try {
+            this.name = new String(cryptoProvider.decrypt((new BigInteger(this.name, 16)).toByteArray()));
+            this.password = new String(cryptoProvider.decrypt((new BigInteger(this.password, 16)).toByteArray()));
+        } catch (NumberFormatException ex){
+            throw new ProfileDataException("");
+        }
     }
 
     @Override

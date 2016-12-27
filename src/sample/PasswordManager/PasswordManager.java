@@ -6,8 +6,11 @@ import sample.Repository.Repository;
 import sample.Repository.StorageFactory;
 import sample.SettingsService.Settings;
 
+import java.awt.color.ProfileDataException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by dmitry on 16.12.16.
@@ -24,8 +27,15 @@ public class PasswordManager {
         this.storageFactory = storageFactory;
         this.repository = (SettingableRepository<Profile>)this.storageFactory.createRepository();
     }
-    public boolean openBase(){
+    public boolean openBase() throws OpenBaseException {
         this.profiles = repository.findAll();
+        try {
+            for (Profile p : this.profiles) {
+                p.decrypt(cryptoProvider);
+            }
+        } catch (ProfileDataException ex){
+            throw new OpenBaseException();
+        }
         if(this.profiles == null)
             return false;
         return true;
@@ -34,33 +44,56 @@ public class PasswordManager {
         return repository.save();
     }
     public boolean createBase(){
+        this.profiles = new ArrayList<>();
         this.repository.getSettings().set("path", this.settings.get("pathDB"));
         this.repository.init();
         return true;
     }
     public void addProfile(String name, String password){
-        this.repository.add(new Profile(name, password));
+        Profile profile = new Profile(name, password);
+        this.profiles.add(new Profile(profile));
+        profile.encrypt(cryptoProvider);
+        this.repository.add(profile);
     }
     public void removeProfile(Profile profile){
-        this.repository.remove(profile);
+        Profile searchable = new Profile(profile);
+        searchable.encrypt(cryptoProvider);
+        this.repository.remove(searchable);
     }
     public void changeProfile(Profile profile, String name, String password){
-        profiles.get(profiles.indexOf(profile)).setName(name);
-        profiles.get(profiles.indexOf(profile)).setName(password);
+        this.removeProfile(profile);
+        Profile newProfile = new Profile(profile);
+        newProfile.setPassword(password);
+        newProfile.setName(name);
+        profile.setName(name);
+        profile.setPassword(password);
+        newProfile.encrypt(cryptoProvider);
+        this.repository.add(newProfile);
     }
     public List<Profile> find(Profile p){
         return this.repository.find(this.storageFactory.createQuery(p));
     }
     public List<Profile> find(Query q){
-        return this.repository.find(q);
+        List<Profile> profiles = this.repository.find(q);
+        for(Profile profile : profiles){
+            profile.decrypt(this.cryptoProvider);
+        }
+        return profiles;
     }
     public List<Profile> getProfiles(){
         return this.profiles;
     }
-    public void saveSettings(){
-        this.settings.save("pm.set");
+    public StorageFactory getStorageFactory(){
+        return this.storageFactory;
     }
-    public void loadSettings(){
-        this.settings = Settings.load("pn.set");
+    public Profile prepareProfileToQuery(Profile profile){
+        profile.encrypt(this.cryptoProvider);
+        return profile;
     }
+//    public void saveSettings(){
+//        this.settings.save("pm.set");
+//    }
+//    public void loadSettings(){
+//        this.settings = Settings.load("pn.set");
+//    }
 }

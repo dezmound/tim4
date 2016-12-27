@@ -17,11 +17,13 @@ import java.security.NoSuchAlgorithmException;
  * Created by dmitry on 16.12.16.
  */
 public class AesCryptoProvider implements CryptoProvider {
-    Settings settings;
+    transient Settings settings;
     public AesCryptoProvider(Settings settings){
         this.settings = settings;
     }
     private byte[] cipherIt(byte[] data, int encryptMode){
+        if(data.length == 0)
+            return data;
         try {
             IvParameterSpec ivParameterSpec = new IvParameterSpec((byte[])settings.get("iv"));
             SecretKeySpec secretKeySpec = new SecretKeySpec((byte[])settings.get("key"), "AES");
@@ -44,6 +46,12 @@ public class AesCryptoProvider implements CryptoProvider {
         }
         return data;
     }
+
+    @Override
+    public void setSettings(Object settings) {
+        this.settings = (Settings) settings;
+    }
+
     @Override
     public byte[] encrypt(byte[] data) {
         return cipherIt(data, Cipher.ENCRYPT_MODE);

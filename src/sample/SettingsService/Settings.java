@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Created by dmitry on 16.12.16.
  */
-public class Settings {
+public class Settings implements Serializable {
     private Map<String, Object> settings;
     public Settings(Map<String, Object> settings){
         this.settings = settings;
@@ -26,15 +26,13 @@ public class Settings {
             e.printStackTrace();
         }
     }
-    public static Settings load(String path){
+    public static Settings load(String path) throws IOException{
         Settings settings = null;
         if(!Files.exists((new File(path)).toPath()))
-            return settings;
+            throw new FileNotFoundException();
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path));
             settings = (Settings) objectInputStream.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
