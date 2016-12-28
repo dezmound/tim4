@@ -66,7 +66,7 @@ public class Profile implements Encryptable, Serializable {
             this.name = new String(cryptoProvider.decrypt((new BigInteger(this.name, 16)).toByteArray()));
             this.password = new String(cryptoProvider.decrypt((new BigInteger(this.password, 16)).toByteArray()));
         } catch (NumberFormatException ex){
-            throw new ProfileDataException("");
+            System.err.println("Warning: profile data was not encrypted!");
         }
     }
 

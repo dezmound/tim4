@@ -45,7 +45,8 @@ public class PasswordManager {
     }
     public boolean createBase(){
         this.profiles = new ArrayList<>();
-        this.repository.getSettings().set("path", this.settings.get("pathDB"));
+        Object pathdb = this.settings.get("pathDB");
+        this.repository.getSettings().set("path", pathdb);
         this.repository.init();
         return true;
     }
@@ -60,7 +61,7 @@ public class PasswordManager {
         searchable.encrypt(cryptoProvider);
         this.repository.remove(searchable);
     }
-    public void changeProfile(Profile profile, String name, String password){
+    public Profile changeProfile(Profile profile, String name, String password){
         this.removeProfile(profile);
         Profile newProfile = new Profile(profile);
         newProfile.setPassword(password);
@@ -69,6 +70,7 @@ public class PasswordManager {
         profile.setPassword(password);
         newProfile.encrypt(cryptoProvider);
         this.repository.add(newProfile);
+        return profile;
     }
     public List<Profile> find(Profile p){
         return this.repository.find(this.storageFactory.createQuery(p));
@@ -90,10 +92,4 @@ public class PasswordManager {
         profile.encrypt(this.cryptoProvider);
         return profile;
     }
-//    public void saveSettings(){
-//        this.settings.save("pm.set");
-//    }
-//    public void loadSettings(){
-//        this.settings = Settings.load("pn.set");
-//    }
 }

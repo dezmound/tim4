@@ -8,7 +8,7 @@ import java.util.Map;
  * Created by dmitry on 16.12.16.
  */
 public class Settings implements Serializable {
-    private Map<String, Object> settings;
+    protected Map<String, Object> settings;
     public Settings(Map<String, Object> settings){
         this.settings = settings;
     }
