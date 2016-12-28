@@ -95,10 +95,6 @@ public class Controller {
             aesCryptoSettings.put("iv", Arrays.copyOfRange(hashMasterKey, 0, 16));
             ((CryptoProvider)managerSettings.get("CryptoProvider")).setSettings(new Settings(aesCryptoSettings));
             manager = new PasswordManager((Settings) managerSettings.get("PasswordManager"), (CryptoProvider) managerSettings.get("CryptoProvider"), (StorageFactory) managerSettings.get("StorageFactory"));
-            //manager.openBase();
-            //manager.addProfile("Вася", "204655");
-            //tableProfiles.getItems().addAll(manager.getProfiles());
-            //manager.saveBase();
         } catch (IOException e) {
             byte[] hashMasterKey = sha1(userInput);
             byte[] doubleHash = sha1(hashMasterKey);
