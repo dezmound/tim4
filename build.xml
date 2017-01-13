@@ -19,18 +19,32 @@
         <javac destdir="${web.classes.dir}" source="${jdk.version}"
                target="${jdk.version}" debug="true"
                includeantruntime="false">
-            <src path="${src.dir}" />
+            <src>
+                <path>
+                    <pathelement location="src" />
+                    <pathelement location="tests" />
+                </path>
+            </src>
+            <classpath>
+                <path>
+                    <pathelement location="${lib.dir}/junit-4.11.jar" />
+                    <pathelement location="${lib.dir}/hamcrest-all-1.1.jar" />
+                </path>
+            </classpath>
         </javac>
     </target>
 
     <path id="classPath">
         <pathelement location="${lib.dir}/junit-4.11.jar" />
+        <pathelement location="${lib.dir}/hamcrest-all-1.1.jar" />
+        <pathelement location="${web.classes.dir}" />
     </path>
 
     <!-- Run jUnit -->
     <target name="junit" depends="compile">
 
         <junit printsummary="yes" haltonfailure="no">
+            <formatter type="plain" usefile="false" />
             <classpath location="${web.classes.dir}">
                 <path refid="classPath" />
             </classpath>
@@ -38,7 +52,7 @@
             <formatter type="xml" />
             <batchtest fork="yes" todir="${report.dir}">
                 <fileset dir="${test.dir}">
-                    <include name="**/*Test*.java" />
+                    <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
 
