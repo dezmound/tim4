@@ -1,0 +1,77 @@
+<project name="TestsTIM4" default="main" basedir=".">
+    <description>
+        Running junit Test
+    </description>
+
+    <!-- Project Structure -->
+    <property name="jdk.version" value="1.8" />
+    <property name="lib.dir" value="./lib" />
+    <property name="projectName" value="WebProject" />
+    <property name="src.dir" location="src" />
+    <property name="test.dir" location="tests" />
+    <property name="report.dir" location="report" />
+    <property name="web.dir" value="war" />
+    <property name="web.classes.dir" location="${web.dir}/WEB-INF/classes" />
+
+    <!-- Compile Java source from ${src.dir} and output it to ${web.classes.dir} -->
+    <target name="compile" depends="init" description="compile source code">
+        <mkdir dir="${web.classes.dir}" />
+        <javac destdir="${web.classes.dir}" source="${jdk.version}"
+               target="${jdk.version}" debug="true"
+               includeantruntime="false">
+            <src>
+                <path>
+                    <pathelement location="src" />
+                    <pathelement location="tests" />
+                </path>
+            </src>
+            <classpath>
+                <path>
+                    <pathelement location="${lib.dir}/junit-4.11.jar" />
+                    <pathelement location="${lib.dir}/hamcrest-all-1.1.jar" />
+                </path>
+            </classpath>
+        </javac>
+    </target>
+
+    <path id="classPath">
+        <pathelement location="${lib.dir}/junit-4.11.jar" />
+        <pathelement location="${lib.dir}/hamcrest-all-1.1.jar" />
+        <pathelement location="${web.classes.dir}" />
+    </path>
+
+    <!-- Run jUnit -->
+    <target name="junit" depends="compile">
+
+        <junit printsummary="yes" haltonfailure="no">
+            <formatter type="plain" usefile="false" />
+            <classpath location="${web.classes.dir}">
+                <path refid="classPath" />
+            </classpath>
+
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+
+        </junit>
+    </target>
+
+    <!-- Create folders -->
+    <target name="init">
+        <mkdir dir="${src.dir}" />
+        <mkdir dir="${web.classes.dir}" />
+        <mkdir dir="${report.dir}" />
+    </target>
+
+    <!-- Delete folders -->
+    <target name="clean" description="clean up">
+        <delete dir="${web.classes.dir}" />
+        <delete dir="${report.dir}" />
+    </target>
+
+    <target name="main" depends="junit" />
+
+</project>
