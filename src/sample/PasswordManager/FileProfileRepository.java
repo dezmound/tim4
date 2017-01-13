@@ -5,10 +5,7 @@ import sample.Repository.Repository;
 import sample.SettingsService.Settings;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by dmitry on 16.12.16.
@@ -35,8 +32,13 @@ public class FileProfileRepository implements SettingableRepository {
 
     @Override
     public List<Profile> findAll() {
-        if(!this.list.isEmpty())
-            return this.list;
+        if(!this.list.isEmpty()) {
+            List profiles = new ArrayList();
+            for(Profile profile : this.list){
+                profiles.add(new Profile(profile));
+            }
+            return profiles;
+        }
         if(this.settings.get("path") == null)
             return null;
         try {
@@ -47,7 +49,11 @@ public class FileProfileRepository implements SettingableRepository {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return this.list;
+        List profiles = new ArrayList();
+        for(Profile profile : this.list){
+            profiles.add(new Profile(profile));
+        }
+        return profiles;
     }
 
     @Override
