@@ -5,6 +5,7 @@
 
     <!-- Project Structure -->
     <property name="jdk.version" value="1.8" />
+    <property name="lib.dir" value="./lib" />
     <property name="projectName" value="WebProject" />
     <property name="src.dir" location="src" />
     <property name="test.dir" location="tests" />
@@ -22,12 +23,17 @@
         </javac>
     </target>
 
+    <path id="classPath">
+        <pathelement location="${lib.dir}/junit-4.11.jar" />
+    </path>
+
     <!-- Run jUnit -->
     <target name="junit" depends="compile">
 
         <junit printsummary="yes" haltonfailure="no">
-
-            <classpath location="${web.classes.dir}" />
+            <classpath location="${web.classes.dir}">
+                <path refid="classPath" />
+            </classpath>
 
             <formatter type="xml" />
             <batchtest fork="yes" todir="${report.dir}">
