@@ -1,0 +1,70 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant"
+         name="HelloProject" default="main" basedir=".">
+    <description>
+        Running junit Test
+    </description>
+
+    <!-- Project Structure -->
+    <property name="jdk.version" value="1.8" />
+    <property name="projectName" value="WebProject" />
+    <property name="src.dir" location="src" />
+    <property name="test.dir" location="tests" />
+    <property name="report.dir" location="report" />
+    <property name="web.dir" value="war" />
+    <property name="web.classes.dir" location="${web.dir}/WEB-INF/classes" />
+
+    <!-- ivy start -->
+    <target name="resolve" description="retrieve dependencies with ivy">
+        <echo message="Getting dependencies..." />
+        <ivy:retrieve />
+
+        <ivy:cachepath pathid="compile.path" conf="compile" />
+        <ivy:cachepath pathid="runtime.path" conf="runtime" />
+        <ivy:cachepath pathid="test.path" conf="test" />
+
+    </target>
+
+    <!-- Compile Java source from ${src.dir} and output it to ${web.classes.dir} -->
+    <target name="compile" depends="init, resolve" description="compile source code">
+        <mkdir dir="${web.classes.dir}" />
+        <javac destdir="${web.classes.dir}" source="${jdk.version}"
+               target="${jdk.version}" debug="true"
+               includeantruntime="false" classpathref="compile.path">
+            <src path="${src.dir}" />
+        </javac>
+    </target>
+
+    <!-- Run jUnit -->
+    <target name="junit" depends="compile">
+
+        <junit printsummary="yes" haltonfailure="no">
+
+            <classpath refid="sample.*" />
+            <classpath location="${web.classes.dir}" />
+
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+
+        </junit>
+    </target>
+
+    <!-- Create folders -->
+    <target name="init">
+        <mkdir dir="${src.dir}" />
+        <mkdir dir="${web.classes.dir}" />
+        <mkdir dir="${report.dir}" />
+    </target>
+
+    <!-- Delete folders -->
+    <target name="clean" description="clean up">
+        <delete dir="${web.classes.dir}" />
+        <delete dir="${report.dir}" />
+    </target>
+
+    <target name="main" depends="junit" />
+
+</project>
